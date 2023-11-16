@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>rqTest</title>
+</head>
+<body>
+<!--리퀘슽 스코프 컨트롤러단에서 rq객체 접근한걸 그냥 보여준것-->
+rqToString v1 : [[${rqToString}]]
+<hr>
+<!--위와동일-->
+rqToString v1 : <span th:text="${rqToString}"></span>
+<hr>
+<!--위와 동일-->
+rqToString v1 : <th:block th:text="${rqToString}"></th:block>
+
+<hr>
+<hr>
+<!--타임리프에서 직접 rq객체(빈)에 접근하는 방법-->
+<!--직접 부르는건 @이로 시작함-->
+<!--리퀘스트 스코프안에서는 공유가 가능하다-->
+rqToString v2 : [[${@rq}]]
+<hr>
+<!--@쓰고 빈이름 쓰면된다 첫글자만 소문자로 바꾸면된다-->
+rqToString v2 : [[${@articleService}]]
+
+</body>
+</html>

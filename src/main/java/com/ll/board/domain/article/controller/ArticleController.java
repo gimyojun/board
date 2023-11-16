@@ -7,9 +7,13 @@ import com.ll.board.global.RsData;
 import com.ll.board.global.rq.Rq;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,8 +31,19 @@ public class ArticleController {
 //    public ArticleController(ArticleService articleService) {
 //        this.articleService = articleService;
 //    }
-
+    //Rq는 리퀘스트 스코프라서 매번 변경되는데 context가 가능한이유는 프록시. 즉 대리자여서 그렇다
+    //어플리케이션 시작할 때 딱한번 들어간다.
+    //매번 달라진다는게 매번 새로운객체가 들어간다는 뜻이다
+    //하나가 내가 요청을 할때마다 달라진다? 얘는 대리자 이다
     private final Rq rq;
+
+    @Data
+    public static class WriteForm {
+        @NotBlank
+        private String title;
+        @NotBlank
+        private String body;
+    }
 
     @GetMapping("article/write")
     String showWrite(){
@@ -37,19 +52,9 @@ public class ArticleController {
 
     @PostMapping("/article/write")
     @ResponseBody
-    RsData write(
-            String title,
-            String body
-    ) {
-        if (title == null || title.trim().length() == 0) {
-            throw new IllegalArgumentException("제목을 입력해주세요.");
-        }
+    RsData write(@Valid WriteForm writeForm) {
 
-        if (body == null || body.trim().length() == 0) {
-            throw new IllegalArgumentException("내용을 입력해주세요.");
-        }
-
-        Article article = articleService.write(title, body);
+        Article article = articleService.write(writeForm.title, writeForm.body);
         RsData<Article> rs = new RsData<>(
                 "S-1",
                 "%d 번 게시물이 작성되었습니다".formatted(article.getId()),
@@ -112,6 +117,13 @@ public class ArticleController {
         return articleService.findAll();
     }
 
+    @GetMapping("article/rqTest")
+    String showRqTest(Model model){
+        String rqToString = rq.toString();
+        model.addAttribute("rqToString", rqToString);
+
+        return "article/rqTest";
+    }
 
 }
 
