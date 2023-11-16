@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -51,17 +52,12 @@ public class ArticleController {
     }
 
     @PostMapping("/article/write")
-    @ResponseBody
-    RsData write(@Valid WriteForm writeForm) {
-
+    String write(@Valid WriteForm writeForm) {
         Article article = articleService.write(writeForm.title, writeForm.body);
-        RsData<Article> rs = new RsData<>(
-                "S-1",
-                "%d 번 게시물이 작성되었습니다".formatted(article.getId()),
-                article
-        );
+        //이부분부터는 그냥 보여주기 식이다.
+        String msg = "id %d, article created".formatted(article.getId());
 
-        return rs;
+        return "redirect:/article/list?msg=" + msg;
     }
     @PostMapping("article/write2")
     @SneakyThrows
@@ -81,30 +77,6 @@ public class ArticleController {
         resp.setCharacterEncoding("UTF-8");
         resp.getWriter().println(objectMapper.writeValueAsString(rs));
     }
-
-    @GetMapping("/article/articleServicePointer")
-    @ResponseBody
-    String articleServicePointer() {
-        return articleService.toString();
-    }
-
-    @GetMapping("/article/httpServletRequestPointer")
-    @ResponseBody
-    String httpServletRequestPointer(HttpServletRequest req) {
-        return req.toString();
-    }
-
-    @GetMapping("/article/httpServletResponsePointer")
-    @ResponseBody
-    String httpServletResponsePointer(HttpServletResponse resp) {
-        return resp.toString();
-    }
-    @GetMapping("/article/rqPointer")
-    @ResponseBody
-    String rqPointer(Rq rq) {
-        return rq.toString();
-    }
-
     @GetMapping("article/lastArticle")
     @ResponseBody
     Article findLastArticle(){
@@ -117,12 +89,18 @@ public class ArticleController {
         return articleService.findAll();
     }
 
-    @GetMapping("article/rqTest")
-    String showRqTest(Model model){
-        String rqToString = rq.toString();
-        model.addAttribute("rqToString", rqToString);
+    @GetMapping("article/list")
+    String showList(Model model){
+        List<Article> articles = articleService.findAll();
+        model.addAttribute("articles",articles);
 
-        return "article/rqTest";
+        return "article/list";
+    }
+    @GetMapping("article/detail/{id}")
+    String showDetail(Model model, @PathVariable long id){
+        Article article = articleService.findById(id).get();
+        model.addAttribute("article", article);
+        return "article/detail";
     }
 
 }
