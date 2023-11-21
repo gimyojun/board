@@ -34,4 +34,8 @@ public class MemberService {
         member.setUsername(username);
         member.setPassword(password);
     }
+
+    public Optional<Member> findByUsername(String username) {
+        return memberRepository.findByUsername(username);
+    }
 }
