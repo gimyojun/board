@@ -46,11 +46,4 @@ public class ArticleRepository {
         articles.removeIf(article -> article.getId() == id);
     }
 
-    public void modify(long id, String title, String body) {
-        Optional<Article> arti = articles.stream().filter(article -> article.getId() == id).findFirst();
-        arti.get().setTitle(title);
-        arti.get().setBody(body);
-
-
-    }
 }
