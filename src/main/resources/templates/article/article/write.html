@@ -2,7 +2,7 @@
 
 <div layout:fragment="content" class="p-2">
 
-    <h1 class="font-bold mb-2">글 작성</h1>
+    <h1 class="font-bold mb-2"><i class="fa-solid fa-pen"></i> 글 작성</h1>
 
     <form class="flex flex-col gap-4" method="POST" onsubmit="submitWriteForm(this); return false;">
         <div class="form-control">
@@ -20,9 +20,8 @@
         </div>
 
         <button class="btn btn-primary btn-block" type="submit">
-            글쓰기
+            <i class="fa-solid fa-pen"></i> 글 작성
         </button>
-
     </form>
 
     <script>
@@ -53,6 +52,7 @@
             form.submit();
         }
     </script>
-</div>
-</html>
 
+</div>
+
+</html>
