@@ -3,6 +3,10 @@ package com.ll.board.domain.member.member.controller;
 import com.ll.board.domain.member.member.entity.Member;
 import com.ll.board.domain.member.member.service.MemberService;
 import com.ll.board.global.rq.Rq;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -36,14 +40,21 @@ public class MemberController {
         return "member/member/login";
     }
     @PostMapping("/member/login")
-    String join(@Valid LoginForm loginForm) {
+    String login(@Valid LoginForm loginForm, HttpServletRequest req, HttpServletResponse response) {
+        //옵셔널로 반환된 객체에 get했을 때 id 없으면 에러
         Member member = memberService.findByUsername(loginForm.username).get();
-
+        //비번 에러
         if (!member.getPassword().equals(loginForm.password)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+        //쿠키생성
+        Cookie cookie = new Cookie("loginedMemberId",member.getId() + "");
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
-        // 로그인 처리
+        HttpSession session = req.getSession();
+        session.setAttribute("loginedMemberId", member.getId());;
+
 
         return rq.redirect("/article/list", "로그인이 완료되었습니다.");
     }

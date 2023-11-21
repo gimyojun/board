@@ -2,9 +2,13 @@ package com.ll.board.domain.article.article.controller;
 
 import com.ll.board.domain.article.article.entity.Article;
 import com.ll.board.domain.article.article.service.ArticleService;
+import com.ll.board.domain.member.member.entity.Member;
+import com.ll.board.domain.member.member.service.MemberService;
 import com.ll.board.global.rq.Rq;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.servlet.http.Cookie;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -13,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +37,7 @@ public class ArticleController {
     //매번 달라진다는게 매번 새로운객체가 들어간다는 뜻이다
     //하나가 내가 요청을 할때마다 달라진다? 얘는 대리자 이다
     private final Rq rq;
+    private final MemberService memberService;
 
     @Data
     public static class WriteForm {
@@ -59,13 +66,42 @@ public class ArticleController {
         return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }
 
-    @GetMapping("article/list")
-    String showList(Model model){
+    @GetMapping("/article/list")
+    String showList(Model model, HttpServletRequest req) {
+        // 쿠키이름이 loginedMemberId 이것인 것의 값을 가져와서 long 타입으로 변환, 만약에 그런게 없다면, 0을 반환
+        long loginedMemberId = Optional.ofNullable(req.getCookies())
+                .stream()
+                .flatMap(Arrays::stream)
+                .filter(cookie -> cookie.getName().equals("loginedMemberId"))
+                .map(Cookie::getValue)
+                .mapToLong(Long::parseLong)
+                .findFirst()
+                .orElse(0);
+
+        if (loginedMemberId > 0) {
+            Member loginedMember = memberService.findById(loginedMemberId).get();
+            model.addAttribute("loginedMember", loginedMember);
+        }
+
+        long fromSessionLoginedMemberId = 0;
+
+        if (req.getSession().getAttribute("loginedMemberId") != null) {
+            fromSessionLoginedMemberId = (long) req.getSession().getAttribute("loginedMemberId");
+        }
+
+        if (fromSessionLoginedMemberId > 0) {
+            Member loginedMember = memberService.findById(fromSessionLoginedMemberId).get();
+            model.addAttribute("fromSessionLoginedMember", loginedMember);
+        }
+
         List<Article> articles = articleService.findAll();
-        model.addAttribute("articles",articles);
+
+        model.addAttribute("articles", articles);
 
         return "article/article/list";
     }
+
+
     @GetMapping("article/detail/{id}")
     String showDetail(Model model, @PathVariable long id){
         Article article = articleService.findById(id).get();
