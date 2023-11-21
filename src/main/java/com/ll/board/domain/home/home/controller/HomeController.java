@@ -1,4 +1,4 @@
-package com.ll.board.domain.home;
+package com.ll.board.domain.home.home.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

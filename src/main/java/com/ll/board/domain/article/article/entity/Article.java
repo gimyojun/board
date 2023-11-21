@@ -1,4 +1,4 @@
-package com.ll.board.domain.article.entity;
+package com.ll.board.domain.article.article.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

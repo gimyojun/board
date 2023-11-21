@@ -1,23 +1,17 @@
-package com.ll.board.domain.article.controller;
+package com.ll.board.domain.article.article.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ll.board.domain.article.entity.Article;
-import com.ll.board.domain.article.service.ArticleService;
-import com.ll.board.global.RsData;
+import com.ll.board.domain.article.article.entity.Article;
+import com.ll.board.domain.article.article.service.ArticleService;
 import com.ll.board.global.rq.Rq;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -45,6 +39,13 @@ public class ArticleController {
         @NotBlank
         private String body;
     }
+    @Data
+    public static class ModifyForm {
+        @NotBlank
+        private String title;
+        @NotBlank
+        private String body;
+    }
 
     @GetMapping("article/write")
     String showWrite(){
@@ -54,39 +55,8 @@ public class ArticleController {
     @PostMapping("/article/write")
     String write(@Valid WriteForm writeForm) {
         Article article = articleService.write(writeForm.title, writeForm.body);
-        //이부분부터는 그냥 보여주기 식이다.
-        String msg = "id %d, article created".formatted(article.getId());
 
-        return "redirect:/article/list?msg=" + msg;
-    }
-    @PostMapping("article/write2")
-    @SneakyThrows
-    void write2(HttpServletRequest req,  HttpServletResponse resp) {
-        String title = req.getParameter("title");
-        String body = req.getParameter("body");
-
-        Article article = articleService.write(title, body);
-        RsData<Article> rs = new RsData<>(
-                "S-1",
-                "%d 게시물이 생성되었습니다.".formatted(article.getId()),
-                article
-        );
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().println(objectMapper.writeValueAsString(rs));
-    }
-    @GetMapping("article/lastArticle")
-    @ResponseBody
-    Article findLastArticle(){
-        return articleService.findLastArticle();
-    }
-
-    @GetMapping("article/getArticles")
-    @ResponseBody
-    List<Article> findAll(){
-        return articleService.findAll();
+        return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }
 
     @GetMapping("article/list")
@@ -101,6 +71,28 @@ public class ArticleController {
         Article article = articleService.findById(id).get();
         model.addAttribute("article", article);
         return "article/detail";
+    }
+
+    @GetMapping("article/modify/{id}")
+    String modify(Model model, @PathVariable long id){
+        Article article = articleService.findById(id).get();
+        model.addAttribute("article", article);
+        return "article/modify";
+    }
+
+    //article/modify/{id} 이 주소에서 post 요청이 들어왔기 때문에
+    @PostMapping("article/modify/{id}")
+    String modify(@PathVariable long id, @Valid ModifyForm modifyForm){
+        articleService.modify(id,modifyForm.title,modifyForm.body);
+
+        return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
+    }
+
+    @GetMapping("article/delete/{id}")
+    String delete(@PathVariable long id){
+        articleService.delete(id);
+
+        return rq.redirect("/article/list", "%d번 게시물 삭제되었습니다.".formatted(id));
     }
 
 }

@@ -1,7 +1,7 @@
-package com.ll.board.domain.article.service;
+package com.ll.board.domain.article.article.service;
 
-import com.ll.board.domain.article.entity.Article;
-import com.ll.board.domain.article.repository.ArticleRepository;
+import com.ll.board.domain.article.article.entity.Article;
+import com.ll.board.domain.article.article.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +35,13 @@ public class ArticleService {
 
     public Optional<Article> findById(long id) {
         return articleRepository.findById(id);
+    }
+
+    public void delete(long id) {
+        articleRepository.delete(id);
+    }
+
+    public void modify(long id, String title, String body) {
+        articleRepository.modify(id,title,body);
     }
 }

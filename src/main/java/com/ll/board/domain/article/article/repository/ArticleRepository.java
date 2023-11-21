@@ -1,6 +1,6 @@
-package com.ll.board.domain.article.repository;
+package com.ll.board.domain.article.article.repository;
 
-import com.ll.board.domain.article.entity.Article;
+import com.ll.board.domain.article.article.entity.Article;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -36,6 +36,21 @@ public class ArticleRepository {
     public Optional<Article> findById(long id) {
         return articles.stream()
                 .filter(article -> article.getId() == id)
+                //처음으로 찾으면 리턴
                 .findFirst();
+    }
+
+    public void delete(long id) {
+        // articles.remove(id);
+        // 이게 더 안전한듯?
+        articles.removeIf(article -> article.getId() == id);
+    }
+
+    public void modify(long id, String title, String body) {
+        Optional<Article> arti = articles.stream().filter(article -> article.getId() == id).findFirst();
+        arti.get().setTitle(title);
+        arti.get().setBody(body);
+
+
     }
 }
