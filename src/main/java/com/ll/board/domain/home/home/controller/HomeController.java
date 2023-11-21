@@ -9,7 +9,8 @@ public class HomeController {
     @GetMapping("/")
     //@ResponseBody
     String showHome(){
-        return "board/home";
+
+        return "redirect:/article/list";
     }
 
 
