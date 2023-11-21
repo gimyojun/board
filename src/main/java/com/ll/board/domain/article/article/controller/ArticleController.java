@@ -49,7 +49,7 @@ public class ArticleController {
 
     @GetMapping("article/write")
     String showWrite(){
-        return "article/write";
+        return "article/article/write";
     }
 
     @PostMapping("/article/write")
@@ -64,20 +64,20 @@ public class ArticleController {
         List<Article> articles = articleService.findAll();
         model.addAttribute("articles",articles);
 
-        return "article/list";
+        return "article/article/list";
     }
     @GetMapping("article/detail/{id}")
     String showDetail(Model model, @PathVariable long id){
         Article article = articleService.findById(id).get();
         model.addAttribute("article", article);
-        return "article/detail";
+        return "article/article/detail";
     }
 
     @GetMapping("article/modify/{id}")
     String modify(Model model, @PathVariable long id){
         Article article = articleService.findById(id).get();
         model.addAttribute("article", article);
-        return "article/modify";
+        return "article/article/modify";
     }
 
     //article/modify/{id} 이 주소에서 post 요청이 들어왔기 때문에
