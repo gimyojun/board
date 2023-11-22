@@ -2,13 +2,10 @@ package com.ll.board.domain.article.article.controller;
 
 import com.ll.board.domain.article.article.entity.Article;
 import com.ll.board.domain.article.article.service.ArticleService;
-import com.ll.board.domain.member.member.entity.Member;
 import com.ll.board.domain.member.member.service.MemberService;
 import com.ll.board.global.rq.Rq;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.servlet.http.Cookie;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,9 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -56,44 +51,19 @@ public class ArticleController {
 
     @GetMapping("article/write")
     String showWrite(){
+        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         return "article/article/write";
     }
 
     @PostMapping("/article/write")
     String write(@Valid WriteForm writeForm) {
-        Article article = articleService.write(writeForm.title, writeForm.body);
-
+        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
+        Article article = articleService.write(rq.getMember(), writeForm.title, writeForm.body);
         return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }
 
     @GetMapping("/article/list")
-    String showList(Model model, HttpServletRequest req) {
-        // 쿠키이름이 loginedMemberId 이것인 것의 값을 가져와서 long 타입으로 변환, 만약에 그런게 없다면, 0을 반환
-        long loginedMemberId = Optional.ofNullable(req.getCookies())
-                .stream()
-                .flatMap(Arrays::stream)
-                .filter(cookie -> cookie.getName().equals("loginedMemberId"))
-                .map(Cookie::getValue)
-                .mapToLong(Long::parseLong)
-                .findFirst()
-                .orElse(0);
-
-        if (loginedMemberId > 0) {
-            Member loginedMember = memberService.findById(loginedMemberId).get();
-            model.addAttribute("loginedMember", loginedMember);
-        }
-
-        long fromSessionLoginedMemberId = 0;
-
-        if (req.getSession().getAttribute("loginedMemberId") != null) {
-            fromSessionLoginedMemberId = (long) req.getSession().getAttribute("loginedMemberId");
-        }
-
-        if (fromSessionLoginedMemberId > 0) {
-            Member loginedMember = memberService.findById(fromSessionLoginedMemberId).get();
-            model.addAttribute("fromSessionLoginedMember", loginedMember);
-        }
-
+    String showList(Model model) {
         List<Article> articles = articleService.findAll();
 
         model.addAttribute("articles", articles);
@@ -103,7 +73,7 @@ public class ArticleController {
 
 
     @GetMapping("article/detail/{id}")
-    String showDetail(Model model, @PathVariable long id){
+    String showDetail(Model model, @PathVariable long id) {
         Article article = articleService.findById(id).get();
         model.addAttribute("article", article);
         return "article/article/detail";
@@ -111,6 +81,7 @@ public class ArticleController {
 
     @GetMapping("article/modify/{id}")
     String modify(Model model, @PathVariable long id){
+        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         Article article = articleService.findById(id).get();
         model.addAttribute("article", article);
         return "article/article/modify";
@@ -126,6 +97,7 @@ public class ArticleController {
 
     @GetMapping("article/delete/{id}")
     String delete(@PathVariable long id){
+        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         articleService.delete(id);
 
         return rq.redirect("/article/list", "%d번 게시물 삭제되었습니다.".formatted(id));

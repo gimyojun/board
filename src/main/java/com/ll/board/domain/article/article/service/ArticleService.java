@@ -2,6 +2,7 @@ package com.ll.board.domain.article.article.service;
 
 import com.ll.board.domain.article.article.entity.Article;
 import com.ll.board.domain.article.article.repository.ArticleRepository;
+import com.ll.board.domain.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,8 @@ public class ArticleService {
 //        this.articleRepository = articleRepository;
 //    }
 
-    public Article write(String title, String body) {
-        Article article = new Article(title,body);
+    public Article write(Member author, String title, String body) {
+        Article article = new Article(author,title,body);
         //레포지토리에서 완성된 Article을 리턴해야한다
         return articleRepository.save(article);
     }
