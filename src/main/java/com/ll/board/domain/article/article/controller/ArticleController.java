@@ -2,7 +2,6 @@ package com.ll.board.domain.article.article.controller;
 
 import com.ll.board.domain.article.article.entity.Article;
 import com.ll.board.domain.article.article.service.ArticleService;
-import com.ll.board.domain.member.member.service.MemberService;
 import com.ll.board.global.rq.Rq;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +31,6 @@ public class ArticleController {
     //매번 달라진다는게 매번 새로운객체가 들어간다는 뜻이다
     //하나가 내가 요청을 할때마다 달라진다? 얘는 대리자 이다
     private final Rq rq;
-    private final MemberService memberService;
 
     @Data
     public static class WriteForm {
@@ -51,13 +49,11 @@ public class ArticleController {
 
     @GetMapping("article/write")
     String showWrite(){
-        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         return "article/article/write";
     }
 
     @PostMapping("/article/write")
     String write(@Valid WriteForm writeForm) {
-        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         Article article = articleService.write(rq.getMember(), writeForm.title, writeForm.body);
         return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }
@@ -81,7 +77,6 @@ public class ArticleController {
 
     @GetMapping("article/modify/{id}")
     String modify(Model model, @PathVariable long id){
-        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         Article article = articleService.findById(id).get();
         model.addAttribute("article", article);
         return "article/article/modify";
@@ -97,7 +92,6 @@ public class ArticleController {
 
     @GetMapping("article/delete/{id}")
     String delete(@PathVariable long id){
-        if(!rq.isLogined()) throw new RuntimeException("로그인 후 이용해 주세요.");
         articleService.delete(id);
 
         return rq.redirect("/article/list", "%d번 게시물 삭제되었습니다.".formatted(id));

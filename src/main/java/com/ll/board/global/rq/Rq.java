@@ -56,12 +56,23 @@ public class Rq {
         return member;
     }
 
-    public void setSesstionAttr(String name, long value) {
+    public void setSesstionAttr(String name, Object value) {
         req.getSession().setAttribute(name, value);
 
     }
-
+    public <T> T getSesstionAttr(String name) {
+        return (T) req.getSession().getAttribute(name);
+    }
     public void removeSessionAttr(String name) {
         req.getSession().removeAttribute(name);
+    }
+
+    public boolean isAdmin() {
+        Member tmp = getMember();
+
+        if(tmp == null)
+            return false;
+
+        return getMember().isAdmin();
     }
 }
