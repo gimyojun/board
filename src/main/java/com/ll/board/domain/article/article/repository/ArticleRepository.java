@@ -38,10 +38,10 @@ public class ArticleRepository {
                 .findFirst();
     }
 
-    public void delete(long id) {
+    public void delete(Article article) {
         // articles.remove(id);
         // 이게 더 안전한듯?
-        articles.removeIf(article -> article.getId() == id);
+        articles.remove(article);
     }
 
 }

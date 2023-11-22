@@ -78,6 +78,9 @@ public class ArticleController {
     @GetMapping("article/modify/{id}")
     String modify(Model model, @PathVariable long id){
         Article article = articleService.findById(id).get();
+        if (!articleService.canModify(rq.getMember(), article))
+            throw new RuntimeException("수정권한이 없습니다.");
+
         model.addAttribute("article", article);
         return "article/article/modify";
     }
@@ -85,14 +88,27 @@ public class ArticleController {
     //article/modify/{id} 이 주소에서 post 요청이 들어왔기 때문에
     @PostMapping("article/modify/{id}")
     String modify(@PathVariable long id, @Valid ModifyForm modifyForm){
-        articleService.modify(id,modifyForm.title,modifyForm.body);
+        Article article = articleService.findById(id).get();
+
+        if (!articleService.canModify(rq.getMember(), article))
+            throw new RuntimeException("수정권한이 없습니다.");
+
+        articleService.modify(article, modifyForm.title, modifyForm.body);
+
+
+
 
         return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
     }
 
     @GetMapping("article/delete/{id}")
     String delete(@PathVariable long id){
-        articleService.delete(id);
+        Article article = articleService.findById(id).get();
+
+        if (!articleService.canDelete(rq.getMember(), article))
+            throw new RuntimeException("삭제 권한이 없습니다.");
+
+        articleService.delete(article);
 
         return rq.redirect("/article/list", "%d번 게시물 삭제되었습니다.".formatted(id));
     }
