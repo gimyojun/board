@@ -16,7 +16,7 @@ public class NeedToAdminInterceptor implements HandlerInterceptor {
     private final Rq rq;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)  {
-        List<String> authorities = rq.getSesstionAttr("authorites");
+        List<String> authorities = rq.getSesstionAttr("authorities");
         if(!authorities.contains("ROLE_ADMIN")){
             throw new RuntimeException("관리자만 이용할 수 있는 페이지입니다.");
         }
