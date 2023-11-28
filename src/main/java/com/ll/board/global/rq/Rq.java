@@ -2,30 +2,39 @@ package com.ll.board.global.rq;
 
 import com.ll.board.domain.member.member.entity.Member;
 import com.ll.board.domain.member.member.service.MemberService;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 //기본적으로 빈은 어플리케이션 스코프지만 이런경우 명시적으로 리퀘스트 스코프다.
 @RequestScope
 @Component
 @Getter
+@RequiredArgsConstructor
 public class Rq {
     private final HttpServletRequest req;
     private final HttpServletResponse resp;
-    private MemberService memberService;
+    private final MemberService memberService;
     private Member member;
+    private User user;
 
-    public Rq(HttpServletRequest req, HttpServletResponse resp, MemberService memberService) {
-        this.req = req;
-        this.resp = resp;
-        this.memberService=memberService;
+    @PostConstruct
+    public void init(){
+        //스프링 스큐리티
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getPrincipal() instanceof User){
+            this.user = (User) authentication.getPrincipal();
+        }
     }
 
 
@@ -35,23 +44,19 @@ public class Rq {
         return "redirect:" + path + "?msg=" + msg;
     }
 
-    private Long getMemberId() {
-        return Optional
-                //req는 현재 요청에 대한 프록시
-                .ofNullable(req.getSession().getAttribute("loginedMemberId"))
-                .map(id -> (long) id)
-                .orElse(0L);
+    private String getMemberUserName() {
+        return user.getUsername();
     }
 
     public boolean isLogined(){
-        return getMemberId() > 0;
+        return user != null;
     }
     public Member getMember() {
         if (!isLogined()) {
             return null;
         }
         if(member==null){
-            member = memberService.findById(getMemberId()).get();
+            member = memberService.findByUsername(getMemberUserName()).get();
         }
         return member;
     }
@@ -73,6 +78,8 @@ public class Rq {
         if(tmp == null)
             return false;
 
-        return getMember().isAdmin();
+        return user.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }
