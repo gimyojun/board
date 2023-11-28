@@ -5,3 +5,7 @@ server:
 spring:
   thymeleaf:
     cache: false
+  security:
+    user:
+      name: user
+      password: 1234
