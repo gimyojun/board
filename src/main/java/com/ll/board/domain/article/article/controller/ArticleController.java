@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -91,7 +88,7 @@ public class ArticleController {
 
     //article/modify/{id} 이 주소에서 post 요청이 들어왔기 때문에
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/modify/{id}")
+    @PutMapping("/modify/{id}")
     String modify(@PathVariable long id, @Valid ModifyForm modifyForm){
         Article article = articleService.findById(id).get();
 
@@ -103,7 +100,7 @@ public class ArticleController {
         return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
     }
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     String delete(@PathVariable long id){
         Article article = articleService.findById(id).get();
 

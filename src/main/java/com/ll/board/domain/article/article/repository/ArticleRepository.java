@@ -39,8 +39,6 @@ public class ArticleRepository {
     }
 
     public void delete(Article article) {
-        // articles.remove(id);
-        // 이게 더 안전한듯?
         articles.remove(article);
     }
 
