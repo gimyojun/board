@@ -1,59 +1,57 @@
 <html layout:decorate="~{global/layout}">
 
-<div layout:fragment="content" class="p-2">
+<head></head>
 
-  <h1 class="font-bold mb-2"><i class="fa-solid fa-right-to-bracket"></i> 로그인</h1>
+<body>
+<div layout:fragment="content">
 
-  <form class="flex flex-col gap-4" method="POST" th:action onsubmit="submitLoginForm(this); return false;">
-<!--<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">-->
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">아이디</span>
-      </label>
-      <input type="text" name="username" placeholder="아이디를 입력해주세요." class="input input-bordered">
-    </div>
+    <h1 class="font-bold mb-2"><i class="fa-solid fa-right-to-bracket"></i> 로그인</h1>
 
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">비밀번호</span>
-      </label>
-      <input type="password" name="password" placeholder="비밀번호를 입력해주세요." class="input input-bordered">
-    </div>
+    <form class="flex flex-col gap-4" method="POST" th:action onsubmit="submitLoginForm(this); return false;">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">아이디</span>
+            </label>
+            <input type="text" name="username" placeholder="아이디를 입력해주세요." class="input input-bordered">
+        </div>
 
-    <button class="btn btn-primary btn-block" type="submit">
-      <i class="fa-solid fa-right-to-bracket"></i> 로그인
-    </button>
-  </form>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">비밀번호</span>
+            </label>
+            <input type="password" name="password" placeholder="비밀번호를 입력해주세요." class="input input-bordered">
+        </div>
 
-  <script>
-    function submitLoginForm(form) {
-      const inputUsername = form.username;
-      const inputPassword = form.password;
+        <button class="btn btn-primary btn-block" type="submit">
+            <i class="fa-solid fa-right-to-bracket"></i> 로그인
+        </button>
+    </form>
 
-      inputUsername.value = inputUsername.value.trim();
-      inputPassword.value = inputPassword.value.trim();
+    <script>
+        function submitLoginForm(form) {
+            form.username.value = form.username.value.trim();
 
-      const username = inputUsername.value;
-      const password = inputPassword.value;
+            if (form.username.value.length == 0) {
+                toastWarning('아이디를 입력해주세요.');
+                form.username.focus();
 
-      if (username.length == 0) {
-        toastWarning('아이디를 입력해주세요.');
-        inputUsername.focus();
+                return;
+            }
 
-        return;
-      }
+            form.password.value = form.password.value.trim();
 
-      if (password.length == 0) {
-        toastWarning('비밀번호를 입력해주세요.');
-        inputPassword.focus();
+            if (form.password.value.length == 0) {
+                toastWarning('비밀번호를 입력해주세요.');
+                form.password.focus();
 
-        return;
-      }
+                return;
+            }
 
-      form.submit();
-    }
-  </script>
+            form.submit();
+        }
+    </script>
 
 </div>
 
+</body>
 </html>
