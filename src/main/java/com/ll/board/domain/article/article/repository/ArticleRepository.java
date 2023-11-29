@@ -13,7 +13,6 @@ import java.util.Optional;
 public class ArticleRepository {
     private final List<Article> articles = new ArrayList<>();
 
-
     public Article save(Article article){
 
         article.setId(articles.size()+1L);
@@ -40,6 +39,11 @@ public class ArticleRepository {
 
     public void delete(Article article) {
         articles.remove(article);
+    }
+    public Optional<Article> findLatest() {
+        return Optional.ofNullable(
+                articles.isEmpty() ? null: articles.getLast()
+        );
     }
 
 }
