@@ -13,4 +13,10 @@ public class RsData<T> {
     private T data;
 
 
+    public boolean isFail() {
+        return resultCode.startsWith("F-");
+    }
+    public boolean isSuccess() {
+        return resultCode.startsWith("S-");
+    }
 }

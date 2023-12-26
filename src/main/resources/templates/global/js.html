@@ -4,6 +4,6 @@
 </script>
 
 <script>
-  if(msg) alert(msg);
-  history.back();
+    localStorage.setItem('historyBackMsg', msg);
+    history.back();
 </script>
