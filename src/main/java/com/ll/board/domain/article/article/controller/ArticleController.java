@@ -56,7 +56,7 @@ public class ArticleController {
     @PostMapping("/write")
     String write(@Valid WriteForm writeForm) {
         Article article = articleService.write(rq.getMember(), writeForm.title, writeForm.body);
-        return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
+        return rq.redirect("/","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }
 
     @GetMapping("/list")
@@ -97,7 +97,7 @@ public class ArticleController {
 
         articleService.modify(article, modifyForm.title, modifyForm.body);
 
-        return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
+        return rq.redirect("/", "%d번 게시물 수정되었습니다.".formatted(id));
     }
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/delete/{id}")
@@ -109,9 +109,27 @@ public class ArticleController {
 
         articleService.delete(article);
 
-        return rq.redirect("/article/list", "%d번 게시물 삭제되었습니다.".formatted(id));
+        return rq.redirect("/", "%d번 게시물 삭제되었습니다.".formatted(id));
     }
+    @Data
+    public static class ArticleCreateForm {
+        @NotBlank(message = "제목을 입력해주세요.")
+        private String title;
+        @NotBlank(message = "내용을 입력해주세요.")
+        private String body;
+    }
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/write2")
+    String showWrite2(ArticleCreateForm articleCreateForm) {
+        return "article/article/write2";
+    }
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/write2")
+    String write2(@Valid ArticleCreateForm articleCreateForm) {
+        Article article = articleService.write(rq.getMember(), articleCreateForm.getTitle(), articleCreateForm.getBody());
 
+        return rq.redirect("/", "%d번 게시물 생성되었습니다.".formatted(article.getId()));
+    }
 }
 
 

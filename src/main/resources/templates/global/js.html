@@ -1,0 +1,9 @@
+<script th:inline="javascript">
+    const msg = /*[[${msg}]]*/ null;
+
+</script>
+
+<script>
+  if(msg) alert(msg);
+  history.back();
+</script>

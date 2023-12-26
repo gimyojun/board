@@ -43,6 +43,10 @@ public class MemberController {
     String join(@Valid JoinForm joinForm) {
         Member member = memberService.join(joinForm.username, joinForm.password);
 
+        //null인 경우는 이미 해당 username으로 회원이 있는경우다.
+        if(member == null){
+            return rq.historyBack("이미 존재하는 회원입니다.");
+        }
         return rq.redirect("/member/login","회원가입이 완료되었습니다");
     }
 
